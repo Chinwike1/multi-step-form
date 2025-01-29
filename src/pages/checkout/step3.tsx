@@ -1,7 +1,7 @@
 import { useFormContext } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { z } from 'zod'
-import { SteppedFlowSchema } from '@/validators/checkout-flow.validator'
+import { CombinedCheckoutSchema } from '@/validators/checkout-flow.validator'
 import ErrorMessage from '@/components/ui/error-mesage'
 import NextButton from '@/components/stepped-form/next-button'
 
@@ -10,7 +10,7 @@ const Step3 = () => {
     register,
     // trigger,
     formState: { errors },
-  } = useFormContext<z.infer<typeof SteppedFlowSchema>>()
+  } = useFormContext<z.infer<typeof CombinedCheckoutSchema>>()
 
   const handleStepSubmit = async () => {
     return
