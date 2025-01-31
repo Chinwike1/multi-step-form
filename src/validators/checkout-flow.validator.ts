@@ -1,8 +1,5 @@
 import { z } from 'zod'
 
-// generic format that works for most countries
-const POSTAL_CODE_REGEX = /^[A-Z0-9]{3,10}$/i
-
 export const step1Schema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address' }),
   firstName: z.string().min(3, 'First name must be at least 3 characters'),
@@ -22,9 +19,6 @@ export const step2Schema = z.object({
     .string()
     .min(5, 'Address must be at least 5 characters')
     .max(100, 'Address must be less than 100 characters'),
-  postalCode: z
-    .string()
-    .regex(POSTAL_CODE_REGEX, 'Please enter a valid postal code'),
 })
 
 export const step3Schema = z.object({

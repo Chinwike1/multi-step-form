@@ -15,7 +15,7 @@ const NextButton = ({
       onClick={onClick}
       {...rest}
     >
-      {isLastStep ? 'Submit' : 'Next'}
+      {isLastStep ? 'Submit' : 'Continue'}
     </Button>
   )
 }

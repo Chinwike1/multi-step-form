@@ -1,7 +1,7 @@
 import { useMultiStepForm } from '@/hooks/use-stepped-form'
 import { Button } from '../ui/button'
 
-const NavigationButtons = () => {
+const PrevButton = () => {
   const { isFirstStep, previousStep } = useMultiStepForm()
 
   return (
@@ -17,4 +17,4 @@ const NavigationButtons = () => {
   )
 }
 
-export default NavigationButtons
+export default PrevButton

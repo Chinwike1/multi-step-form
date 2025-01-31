@@ -23,12 +23,7 @@ export type FormStep = {
   validationSchema: ZodType<unknown>
   fields: FieldKeys[]
 }
-
-export interface MultiStepFormReturn {
-  currentStep: FormStep
+export type SavedFormState = {
   currentStepIndex: number
-  nextStep: () => void
-  previousStep: () => void
-  isFirstStep: boolean
-  isLastStep: boolean
+  formValues: Record<string, unknown>
 }

@@ -26,7 +26,7 @@ export const checkoutSteps: FormStep[] = [
     icon: HomeIcon,
     position: 2,
     validationSchema: step2Schema,
-    fields: ['country', 'city', 'shippingAddress', 'postalCode'],
+    fields: ['country', 'city', 'shippingAddress'],
   },
   {
     title: 'Step 3: Payment Details',

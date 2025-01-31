@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { createContext, useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 
-import { FormStep, MultiStepFormContextProps } from '@/types'
+import { FormStep, MultiStepFormContextProps, SavedFormState } from '@/types'
 import PrevButton from '@/components/stepped-form/prev-button'
 import { FormProvider, useForm } from 'react-hook-form'
 import {
@@ -12,11 +12,6 @@ import {
 import ProgressIndicator from './progress-indicator'
 import { useLocalStorage } from '@mantine/hooks'
 import { useToast } from '@/hooks/use-toast'
-
-interface StoredFormState {
-  currentStepIndex: number
-  formValues: Record<string, unknown>
-}
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const MultiStepFormContext =
@@ -31,37 +26,49 @@ const MultiStepForm = ({
 }) => {
   const methods = useForm<z.infer<typeof CombinedCheckoutSchema>>({
     resolver: zodResolver(CombinedCheckoutSchema),
+    defaultValues: {
+      email: '',
+      firstName: '',
+      lastName: '',
+      country: '',
+      city: '',
+      shippingAddress: '',
+      cardholderName: '',
+      cardNumber: '',
+      cvv: '',
+    },
   })
+
   const { toast } = useToast()
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const currentStep = steps[currentStepIndex]
 
-  const [storedFormState, setStoredFormState] =
-    useLocalStorage<StoredFormState | null>({
+  const [savedFormState, setSavedFormState] =
+    useLocalStorage<SavedFormState | null>({
       key: localStorageKey,
       defaultValue: null,
     })
 
   // Restore form state from LS
   useEffect(() => {
-    if (storedFormState) {
-      setCurrentStepIndex(storedFormState.currentStepIndex)
-      methods.reset(storedFormState.formValues)
+    if (savedFormState) {
+      setCurrentStepIndex(savedFormState.currentStepIndex)
+      methods.reset(savedFormState.formValues)
     }
-  }, [methods, storedFormState])
+  }, [methods, savedFormState])
 
   const saveFormState = (stepIndex: number) => {
-    const currentFormValues = methods.getValues()
-    setStoredFormState({
+    const formValues = methods.getValues()
+    setSavedFormState({
       currentStepIndex: stepIndex ?? currentStepIndex,
-      formValues: currentFormValues,
+      formValues,
     })
   }
 
   const clearFormState = () => {
-    methods.reset()
+    setSavedFormState(null)
     setCurrentStepIndex(0)
-    setStoredFormState(null)
+    methods.reset()
     window.localStorage.removeItem(localStorageKey)
   }
 
@@ -72,12 +79,16 @@ const MultiStepForm = ({
       return
     }
 
-    const values = methods.getValues()
+    // grab values in current step and transform values to object
+    const currentStepValues = methods.getValues(currentStep.fields)
     const formValues = Object.fromEntries(
-      currentStep.fields.map((field) => [field, values[field] || ''])
+      currentStep.fields.map((field, index) => [
+        field,
+        currentStepValues[index] || '',
+      ])
     )
 
-    // validate form state against schema and set errors
+    // validate form values against schema and set errors
     if (currentStep.validationSchema) {
       const validationResult =
         currentStep.validationSchema.safeParse(formValues)
@@ -94,34 +105,23 @@ const MultiStepForm = ({
     }
 
     if (currentStepIndex < steps.length - 1) {
-      setCurrentStepIndex(currentStepIndex + 1)
       saveFormState(currentStepIndex + 1)
+      setCurrentStepIndex(currentStepIndex + 1)
     }
   }
 
   const previousStep = () => {
     if (currentStepIndex > 0) {
-      setCurrentStepIndex(currentStepIndex - 1)
       saveFormState(currentStepIndex - 1)
+      setCurrentStepIndex(currentStepIndex - 1)
     }
   }
 
   const goToStep = (position: number) => {
     if (position >= 0 && position - 1 < steps.length) {
-      setCurrentStepIndex(position - 1)
       saveFormState(position - 1)
+      setCurrentStepIndex(position - 1)
     }
-  }
-
-  const value: MultiStepFormContextProps = {
-    currentStep: steps[currentStepIndex],
-    currentStepIndex,
-    isFirstStep: currentStepIndex === 0,
-    isLastStep: currentStepIndex === steps.length - 1,
-    goToStep,
-    nextStep,
-    previousStep,
-    steps,
   }
 
   async function submitSteppedForm(
@@ -142,6 +142,17 @@ const MultiStepForm = ({
     } catch (error) {
       console.error('Form submission error:', error)
     }
+  }
+
+  const value: MultiStepFormContextProps = {
+    currentStep: steps[currentStepIndex],
+    currentStepIndex,
+    isFirstStep: currentStepIndex === 0,
+    isLastStep: currentStepIndex === steps.length - 1,
+    goToStep,
+    nextStep,
+    previousStep,
+    steps,
   }
 
   return (

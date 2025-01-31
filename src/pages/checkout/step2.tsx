@@ -36,10 +36,6 @@ const Step2 = () => {
         />
         <ErrorMessage message={errors.shippingAddress?.message} />
       </div>
-      <div>
-        <Input {...register('postalCode')} placeholder='Postal Code' />
-        <ErrorMessage message={errors.postalCode?.message} />
-      </div>
       <NextButton onClick={handleStepSubmit} />
     </div>
   )

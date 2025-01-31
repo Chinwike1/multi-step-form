@@ -30,7 +30,7 @@ export default function ProgressIndicator() {
               <div key={step.position} className='relative z-10'>
                 <motion.button
                   onClick={() => goToStep(step.position)}
-                  className={`flex size-14 items-center justify-center rounded-full border-2 ${
+                  className={`flex size-16 items-center justify-center rounded-full border-2 ${
                     isCompleted || isCurrent
                       ? 'border-primary bg-black text-white'
                       : 'border-gray-200 bg-white text-gray-400'

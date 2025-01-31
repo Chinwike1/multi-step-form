@@ -8,7 +8,6 @@ import NextButton from '@/components/stepped-form/next-button'
 const Step3 = () => {
   const {
     register,
-    // trigger,
     formState: { errors },
   } = useFormContext<z.infer<typeof CombinedCheckoutSchema>>()
 
